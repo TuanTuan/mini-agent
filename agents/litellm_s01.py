@@ -9,6 +9,14 @@ litellm_s01.py - Agent Loop with LiteLLM SDK (Azure GPT-5.2)
     AZURE_API_BASE     - Azure 端点 URL
     AZURE_API_VERSION  - API 版本
     AZURE_DEPLOYMENT   - 部署名称 (默认 gpt-5.2)
+
+命令行参数:
+    python litellm_s01.py                    # 默认：终端详细日志 + 显示RAW
+    python litellm_s01.py -q                 # 安静模式：不在终端显示日志
+    python litellm_s01.py --no-show-raw      # 不显示原始API数据
+    python litellm_s01.py -o session.md      # 输出到Markdown文件
+    python litellm_s01.py -q -o logs/s01.md  # 只写文件，不在终端显示
+    python litellm_s01.py --log-file session.md --no-file-show-raw  # 文件中不含RAW
 """
 
 import json
@@ -18,7 +26,7 @@ import subprocess
 import litellm
 from dotenv import load_dotenv
 
-from logger_openai import OpenAILogger
+from logger_openai import create_logger_from_args, parse_logger_args, get_logger_config_string
 
 load_dotenv(override=True)
 
@@ -33,7 +41,9 @@ AZURE_DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT", "gpt-5.2")
 MODEL = f"azure/{AZURE_DEPLOYMENT}"
 SYSTEM_PROMPT = f"You are a coding agent at {os.getcwd()}. Use bash to solve tasks. Act, don't explain."
 
-logger = OpenAILogger(verbose=True, show_raw=True)
+# 解析命令行参数并初始化日志器
+_args = parse_logger_args()
+logger = create_logger_from_args(_args)
 
 # ============================================================================
 # OpenAI 格式的工具定义
@@ -127,6 +137,14 @@ def agent_loop(messages: list):
         message = choice.get("message") or {}
         finish_reason = choice.get("finish_reason") or "stop"
         tool_calls = message.get("tool_calls") or []
+        usage = response_dict.get("usage") or {}
+
+        # 显示 LLM 响应摘要
+        logger.llm_response_summary(
+            finish_reason,
+            {"prompt_tokens": usage.get("prompt_tokens", 0), "completion_tokens": usage.get("completion_tokens", 0)},
+            len(tool_calls)
+        )
 
         # 追加 assistant 消息
         assistant_msg = {"role": "assistant", "content": message.get("content") or ""}
@@ -189,6 +207,12 @@ if __name__ == "__main__":
         api_version=AZURE_API_VERSION
     )
 
+    # 显示当前日志配置
+    print(logger._color(f"\n  ⚙️ Logger Config: {get_logger_config_string(_args)}", "dim"))
+    if _args.log_file:
+        print(logger._color(f"  📁 Log file: {_args.log_file}", "dim"))
+    print()
+
     # OpenAI 格式: system 是第一条消息
     history = [{"role": "system", "content": SYSTEM_PROMPT}]
 
@@ -213,3 +237,6 @@ if __name__ == "__main__":
                     print(content)
                 break
         print()
+
+    # 结束会话
+    logger.session_end("用户退出")
