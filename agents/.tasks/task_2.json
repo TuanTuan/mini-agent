@@ -1,0 +1,13 @@
+{
+  "id": 2,
+  "subject": "Write code",
+  "description": "",
+  "status": "in_progress",
+  "blockedBy": [
+    1
+  ],
+  "blocks": [
+    3
+  ],
+  "owner": "bob"
+}

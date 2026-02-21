@@ -1,0 +1,40 @@
+{
+  "nav": { "home": "Home", "timeline": "Timeline", "compare": "Compare", "layers": "Layers", "github": "GitHub" },
+  "home": { "hero_title": "Learn Claude Code", "hero_subtitle": "Build an AI coding agent from scratch, one concept at a time", "start": "Start Learning", "core_pattern": "The Core Pattern", "core_pattern_desc": "Every AI coding agent shares the same loop: call the model, execute tools, feed results back. Everything else is details.", "learning_path": "Learning Path", "learning_path_desc": "11 progressive sessions, from a simple loop to full autonomous teams", "layers_title": "Architectural Layers", "layers_desc": "Five orthogonal concerns that compose into a complete agent", "loc": "LOC", "learn_more": "Learn More", "versions_in_layer": "versions", "message_flow": "Message Growth", "message_flow_desc": "Watch the messages array grow as the agent loop executes" },
+  "version": { "loc": "lines of code", "tools": "tools", "new": "New", "prev": "Previous", "next": "Next", "view_source": "View Source", "view_diff": "View Diff", "design_decisions": "Design Decisions", "whats_new": "What's New", "tutorial": "Tutorial", "simulator": "Agent Loop Simulator", "execution_flow": "Execution Flow", "architecture": "Architecture", "concept_viz": "Concept Visualization", "alternatives": "Alternatives Considered" },
+  "sim": { "play": "Play", "pause": "Pause", "step": "Step", "reset": "Reset", "speed": "Speed", "step_of": "of" },
+  "timeline": { "title": "Learning Path", "subtitle": "s01 to s11: Progressive Agent Design", "layer_legend": "Layer Legend", "loc_growth": "LOC Growth", "learn_more": "Learn More" },
+  "layers": {
+    "title": "Architectural Layers",
+    "subtitle": "Five orthogonal concerns that compose into a complete agent",
+    "tools": "What the agent CAN do. The foundation: tools give the model capabilities to interact with the world.",
+    "planning": "How work is organized. From simple todo lists to dependency-aware task boards shared across agents.",
+    "memory": "Keeping context within limits. Compression strategies that let agents work infinitely without losing coherence.",
+    "concurrency": "Non-blocking execution. Background threads and notification buses for parallel work.",
+    "collaboration": "Multi-agent coordination. Teams, messaging, and autonomous teammates that think for themselves."
+  },
+  "compare": {
+    "title": "Compare Versions",
+    "subtitle": "See what changed between any two versions",
+    "select_a": "Version A",
+    "select_b": "Version B",
+    "loc_delta": "LOC Delta",
+    "lines": "lines",
+    "new_tools_in_b": "New Tools in B",
+    "new_classes_in_b": "New Classes in B",
+    "new_functions_in_b": "New Functions in B",
+    "tool_comparison": "Tool Comparison",
+    "only_in": "Only in",
+    "shared": "Shared",
+    "none": "None",
+    "source_diff": "Source Code Diff",
+    "empty_hint": "Select two versions above to compare them.",
+    "architecture": "Architecture"
+  },
+  "diff": {
+    "new_classes": "New Classes",
+    "new_tools": "New Tools",
+    "new_functions": "New Functions",
+    "loc_delta": "LOC Delta"
+  }
+}

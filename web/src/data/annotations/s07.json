@@ -1,0 +1,47 @@
+{
+  "version": "s07",
+  "decisions": [
+    {
+      "id": "file-based-persistence",
+      "title": "Tasks Stored as JSON Files, Not In-Memory",
+      "description": "Tasks are persisted as JSON files in a .tasks/ directory on the filesystem instead of being held in memory. This has three critical benefits: (1) Tasks survive process crashes -- if the agent dies mid-task, the task board is still on disk when it restarts. (2) Multiple agents can read and write to the same task directory, enabling multi-agent coordination without shared memory. (3) Humans can inspect and manually edit task files for debugging. The filesystem becomes the shared database.",
+      "alternatives": "In-memory storage (like v2's TodoWrite) is simpler and faster but loses state on crash and doesn't work across multiple agent processes. A proper database (SQLite, Redis) would provide ACID guarantees and better concurrency, but adds a dependency and operational complexity. Files are the zero-dependency persistence layer that works everywhere.",
+      "zh": {
+        "title": "任务存储为 JSON 文件，而非内存",
+        "description": "任务以 JSON 文件形式持久化在 .tasks/ 目录中，而非保存在内存里。这有三个关键好处：(1) 任务在进程崩溃后仍然存在——如果 agent 在任务中途崩溃，重启后任务板仍在磁盘上；(2) 多个 agent 可以读写同一任务目录，无需共享内存即可实现多代理协调；(3) 人类可以查看和手动编辑任务文件来调试。文件系统就是共享数据库。"
+      },
+      "ja": {
+        "title": "タスクをメモリではなく JSON ファイルとして保存",
+        "description": "タスクはメモリ内ではなく .tasks/ ディレクトリに JSON ファイルとして永続化されます。3つの重要な利点があります：(1) プロセスのクラッシュ後もタスクが存続する――エージェントがタスク途中でクラッシュしても、再起動時にタスクボードはディスク上に残っています。(2) 複数のエージェントが同じタスクディレクトリを読み書きでき、共有メモリなしにマルチエージェント連携が可能になります。(3) 人間がデバッグのためにタスクファイルを検査・手動編集できます。ファイルシステムが共有データベースになります。"
+      }
+    },
+    {
+      "id": "dependency-graph",
+      "title": "Tasks Have blocks/blockedBy Dependency Fields",
+      "description": "Each task can declare which other tasks it blocks (downstream dependents) and which tasks block it (upstream dependencies). An agent will not start a task that has unresolved blockedBy dependencies. This is essential for multi-agent coordination: when Agent A is writing the database schema and Agent B needs to write queries against it, Agent B's task is blockedBy Agent A's task. Without dependencies, both agents might start simultaneously and Agent B would work against a schema that doesn't exist yet.",
+      "alternatives": "Simple priority ordering (high/medium/low) doesn't capture 'task B literally cannot start until task A finishes.' A centralized coordinator that assigns tasks in order would work but creates a single point of failure and bottleneck. Declarative dependencies let each agent independently determine what it can work on by reading the task files.",
+      "zh": {
+        "title": "任务具有 blocks/blockedBy 依赖字段",
+        "description": "每个任务可以声明它阻塞哪些任务（下游依赖）以及它被哪些任务阻塞（上游依赖）。Agent 不会开始有未解决 blockedBy 依赖的任务。这对多代理协调至关重要：当 Agent A 在编写数据库 schema、Agent B 需要写查询时，Agent B 的任务被 Agent A 的任务阻塞。没有依赖关系，两个 agent 可能同时开始，而 Agent B 会针对一个尚不存在的 schema 工作。"
+      },
+      "ja": {
+        "title": "タスクに blocks/blockedBy 依存関係フィールド",
+        "description": "各タスクは、自分がブロックするタスク（下流の依存先）と、自分をブロックするタスク（上流の依存元）を宣言できます。エージェントは未解決の blockedBy 依存がある タスクを開始しません。これはマルチエージェント連携に不可欠です：エージェント A がデータベーススキーマを書いていてエージェント B がそれに対するクエリを書く必要がある場合、B のタスクは A のタスクにブロックされます。依存関係がなければ両エージェントが同時に開始し、B はまだ存在しないスキーマに対して作業することになります。"
+      }
+    },
+    {
+      "id": "task-replaces-todo",
+      "title": "TaskManager Replaces TodoWrite",
+      "description": "TaskManager is the multi-agent evolution of TodoWrite. Same core concept (a list of items with statuses) but with critical additions: file persistence (survives crashes), dependency tracking (blocks/blockedBy), ownership (which agent is working on what), and multi-process safety. TodoWrite was designed for a single agent tracking its own work in memory. TaskManager is designed for a team of agents coordinating through the filesystem. The API is intentionally similar so the conceptual upgrade path is clear.",
+      "alternatives": "Keeping TodoWrite for single-agent use and adding TaskManager only for multi-agent scenarios would avoid breaking the single-agent experience. But maintaining two systems with overlapping functionality increases complexity. TaskManager is a strict superset of TodoWrite -- a single agent using TaskManager just ignores the multi-agent features.",
+      "zh": {
+        "title": "TaskManager 取代 TodoWrite",
+        "description": "TaskManager 是 TodoWrite 的多代理进化版。核心概念相同（带状态的项目列表），但增加了关键能力：文件持久化（崩溃后存活）、依赖追踪（blocks/blockedBy）、所有权（哪个 agent 在处理什么）、以及多进程安全。TodoWrite 为单 agent 在内存中追踪自身工作而设计。TaskManager 为代理团队通过文件系统协调而设计。API 刻意保持相似，使概念升级路径清晰。"
+      },
+      "ja": {
+        "title": "TaskManager が TodoWrite を置き換え",
+        "description": "TaskManager は TodoWrite のマルチエージェント進化版です。コア概念は同じ（ステータス付きの項目リスト）ですが、重要な追加があります：ファイル永続化（クラッシュ後も存続）、依存関係追跡（blocks/blockedBy）、所有権（どのエージェントが何を担当しているか）、マルチプロセス安全性。TodoWrite は単一エージェントがメモリ内で自身の作業を追跡するために設計されました。TaskManager はエージェントチームがファイルシステムを通じて連携するために設計されています。API は意図的に類似させ、概念的なアップグレードパスを明確にしています。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  --color-layer-tools: #3B82F6;
+  --color-layer-planning: #10B981;
+  --color-layer-memory: #8B5CF6;
+  --color-layer-concurrency: #F59E0B;
+  --color-layer-collaboration: #EF4444;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f4f4f5;
+  --color-text: #09090b;
+  --color-text-secondary: #71717a;
+  --color-border: #e4e4e7;
+}
+
+.dark {
+  --color-bg: #09090b;
+  --color-bg-secondary: #18181b;
+  --color-text: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-border: #27272a;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+@media (max-width: 640px) {
+  pre, code {
+    font-size: 11px;
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
